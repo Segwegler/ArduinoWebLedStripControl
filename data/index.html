@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang=eg>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src="https://kit.fontawesome.com/5f8dc23529.js" crossorigin="anonymous"></script>
+
+    
+<style> 
+    html, body{
+        background-color: grey;
+    }
+    
+    
+    
+    .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "a";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+    
+    
+</style>
+
+<title>Web LED control</title>
+    
+    <body>
+        <div class="w3-container w3-grey w3-center w3-text-white">
+            <p>Led Controler</p>
+        </div>
+    
+        <div class="w3-container w3-center"><canvas id="picker"></canvas></div>
+
+    </body>
+</html>
+    
+
+
+
+<script>
+function xmlhttp(r){
+    var x = new XMLHttpRequest();
+    
+    x.open("GET",r, true);
+    x.send();
+    
+}
+    
+function test(a){
+    
+    console.log(document.getElementById("sw1"));
+}
+
+class Picker {
+	constructor(target, width, height){
+		this.target = target;
+		this.width = width-20;
+		this.height = height-20;
+		this.target.width = width;
+		this.target.height = height;
+        this.off = 10
+		//get context
+		this.context = this.target.getContext("2d");
+		//Circle (color selector Circle)
+		this.pickerCircle = {x:this.width/2+10, y:this.height/2+10, width:7, height:7};
+        this.target.addEventListener("mousedown", this.mouseDown, false);
+	   
+        this.setupListeners();
+    
+    }
+	
+	draw(){
+		this.build();
+	}
+		
+	build(){
+		let f = Math.PI/45;
+		let i = 0;
+		let colors = ["red","green","blue","yellow","orange" ,"black", "white", "purple"];
+        
+        
+		
+		for(i = 0; i<8; i++){
+			let x = i * Math.PI/4;
+			this.context.beginPath();
+			this.context.arc(this.pickerCircle.x, this.pickerCircle.y, this.width/2, x+f, (Math.PI /4)+x-f);
+			this.context.arc(this.pickerCircle.x, this.pickerCircle.y, this.width/4, (Math.PI/4) + x-f, x+f , true);
+			this.context.closePath();
+		
+			this.context.strokeStyle = "black";
+			this.context.lineWidth = 5;
+			this.context.stroke();
+			this.context.fillStyle = colors[i];
+			this.context.fill();
+		}
+		
+	}
+    setupListeners(){
+        const onMouseDown = (e) => {
+            let currentX = e.clientX - this.target.offsetLeft;
+            let currentY = e.clientY - this.target.offsetTop;
+            //console.log(currentX,currentY);
+            this.getPickedColor(currentX,currentY);
+        }
+        this.target.addEventListener("mousedown", onMouseDown)
+    }
+    
+    
+	getPickedColor(x,y) {
+        let imageData = this.context.getImageData(x, y, 1, 1);
+        let color = "color?r=" + imageData.data[0] + ";g=" + imageData.data[1] + ";b=" + imageData.data[2] ;
+        xmlhttp(color);
+        return color;
+  }
+}
+	
+	
+
+let picker = new Picker(document.getElementById("picker"), 300, 300);
+
+picker.draw();
+console.log("a");
+</script>
